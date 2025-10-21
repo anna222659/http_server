@@ -1021,6 +1021,7 @@ async def openai_v1_completions(request: CompletionRequest, raw_request: Request
     )
 
 import httpx
+import pickle
 async def call(request: ChatCompletionRequest, raw_request: Request):
     try:
         # Method 1: Using pickle for binary serialization
